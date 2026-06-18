@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   Users, Cloud, Bot, Shield, Check, X,
   Sparkles, Smartphone, TrendingUp, Mic,
   ChevronRight, Zap, Target, FileText,
 } from "lucide-react";
-import { SlideShell, Eyebrow, Logo, YkonMark, rise } from "./primitives";
+import { SlideShell, Eyebrow, Logo, rise } from "./primitives";
 import type { ComponentType } from "react";
 
 /* ─── Slide number badge ────────────────────────────────────── */
@@ -34,7 +35,6 @@ function Slide1() {
       <div className="relative flex h-full flex-col">
         <motion.div variants={rise} className="flex items-center justify-between px-12 pt-10">
           <Logo variant="light" />
-          <YkonMark variant="light" />
         </motion.div>
 
         <div className="flex flex-1 flex-col items-center justify-center px-12 text-center">
@@ -133,6 +133,13 @@ function Slide2() {
     },
   ];
 
+  const reveal = {
+    hidden: { opacity: 0, x: 14 },
+    show: (i: number) => ({ opacity: 1, x: 0, transition: { duration: 0.45, delay: i * 0.08 } }),
+  };
+
+  const [visible, setVisible] = useState(1);
+
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-30" />
@@ -141,7 +148,14 @@ function Slide2() {
       <div className="relative flex h-full flex-col px-20 py-16">
         <div className="flex items-end justify-between">
           <div>
-            <Eyebrow>Sommaire</Eyebrow>
+            <motion.div
+              variants={rise}
+              className="inline-flex items-center gap-2 text-[15px] font-bold uppercase tracking-[0.2em]"
+              style={{ color: "var(--siga-mid)" }}
+            >
+              <span className="inline-block h-2 w-2 rounded-full" style={{ background: "currentColor" }} />
+              Sommaire
+            </motion.div>
             <motion.h2
               variants={rise}
               className="mt-6 text-[48px] font-bold leading-[1.05] tracking-[-0.035em]"
@@ -154,34 +168,47 @@ function Slide2() {
           </div>
           <motion.div
             variants={rise}
-            className="max-w-xs text-right text-[14px] leading-relaxed"
-            style={{ color: "var(--siga-mid)" }}
+            className="max-w-xs text-right text-[16px] font-medium leading-relaxed"
+            style={{ color: "var(--siga-dark)" }}
           >
             Présenter une solution SaaS RH complète, conforme à la réglementation algérienne et enrichie par l'IA.
           </motion.div>
         </div>
-
-        <div className="mt-16 grid grid-cols-2 gap-6">
-          {sections.map((s, i) => (
-            <motion.div
-              key={s.n}
-              variants={rise}
-              className="group flex gap-6 rounded-2xl border bg-white/60 p-6 backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-lg"
-              style={{ borderColor: "rgba(30,58,95,0.1)" }}
-            >
-              <div
-                className="text-[40px] font-black leading-none opacity-20 transition-opacity group-hover:opacity-100"
-                style={{ color: "var(--siga-mid)" }}
+          <div
+            className="mt-16 grid grid-cols-2 gap-6 cursor-pointer"
+            onClick={() => setVisible((v: number) => Math.min(sections.length, v + 1))}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setVisible((v: number) => Math.min(sections.length, v + 1));
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            {sections.map((s, i) => (
+              <motion.div
+                key={s.n}
+                initial="hidden"
+                animate={i < visible ? "show" : "hidden"}
+                variants={reveal}
+                custom={i}
+                className="flex gap-6 rounded-2xl border bg-white/60 p-6 backdrop-blur-sm shadow-lg"
+                style={{ borderColor: "rgba(30,58,95,0.1)" }}
               >
-                {s.n}
-              </div>
-              <div>
-                <div className="text-[20px] font-bold" style={{ color: "var(--siga-dark)" }}>{s.t}</div>
-                <div className="mt-2 text-[15px] leading-snug" style={{ color: "var(--siga-mid)" }}>{s.d}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                <div
+                  className="text-[40px] font-black leading-none"
+                  style={{ color: "var(--siga-mid)" }}
+                >
+                  {s.n}
+                </div>
+                <div>
+                  <div className="text-[20px] font-bold" style={{ color: "var(--siga-dark)" }}>{s.t}</div>
+                  <div className="mt-2 text-[16px] font-medium leading-snug" style={{ color: "var(--siga-dark)" }}>{s.d}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
       </div>
     </SlideShell>
   );
@@ -220,7 +247,7 @@ function Slide3() {
       <div className="siga-grid-bg absolute inset-0 opacity-25" />
       <SlideNumber n={3} total={TOTAL} />
 
-      <div className="relative flex h-full flex-col px-16 py-14">
+      <div className="relative flex h-full flex-col px-16 py-14 justify-center">
         <Eyebrow>Partie 1</Eyebrow>
 
         <div className="mt-5 flex flex-1 gap-14">
@@ -440,14 +467,7 @@ function Slide5() {
               Une solution cloud-native, conforme à la réglementation algérienne et enrichie par l'IA.
             </motion.p>
           </div>
-
-          <motion.div variants={rise} className="flex gap-3 text-[13px] font-semibold" style={{ color: "var(--siga-dark)" }}>
-            <span className="rounded-full bg-[color:var(--siga-bg)] px-4 py-1.5">Responsables RH</span>
-            <span className="rounded-full bg-[color:var(--siga-bg)] px-4 py-1.5">Managers</span>
-            <span className="rounded-full bg-[color:var(--siga-bg)] px-4 py-1.5">Employés</span>
-          </motion.div>
         </div>
-
         <div className="mt-14 grid grid-cols-4 gap-6">
           {pillars.map((p, i) => (
             <motion.div
@@ -503,8 +523,7 @@ function Slide6() {
       <div className="relative flex h-full flex-col px-16 py-14">
         <Eyebrow>Méthodologie Agile</Eyebrow>
 
-        {/* title + PO/SM/Devs */}
-        <div className="flex items-end justify-between">
+        <div>
           <motion.h2
             variants={rise}
             className="mt-4 text-[46px] font-bold leading-[1.05] tracking-[-0.035em]"
@@ -514,38 +533,17 @@ function Slide6() {
             <br />
             <span style={{ color: "var(--siga-mid)" }}>en 6 sprints.</span>
           </motion.h2>
-          <motion.div
-            variants={rise}
-            className="text-right text-[13px] font-bold"
-            style={{ color: "var(--siga-dark)", opacity: 0.6 }}
-          >
-            PO : YAICI Yanis &nbsp;|&nbsp; SM : ACHROUFENE Achour &nbsp;|&nbsp; Devs : HAMMACHE &amp; HADJI
-          </motion.div>
         </div>
 
-        {/* scrum pills */}
-        <motion.div variants={rise} className="mt-5 flex gap-3">
-          <span
-            className="rounded-full border bg-white px-5 py-2 text-[13px] font-bold shadow-sm"
-            style={{ borderColor: "rgba(30,58,95,0.1)", color: "var(--siga-dark)" }}
-          >
-            3 Piliers : Transparence | Inspection | Adaptation
-          </span>
-          <span
-            className="rounded-full border bg-white px-5 py-2 text-[13px] font-bold shadow-sm"
-            style={{ borderColor: "rgba(30,58,95,0.1)", color: "var(--siga-dark)" }}
-          >
-            4 Événements : Planning | Daily | Review | Retro
-          </span>
-        </motion.div>
+        {/* Scrum pills removed per request */}
 
         {/* sprint timeline */}
-        <div className="relative mt-10 flex-1">
+        <div className="relative mt-16 flex-1">
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-            className="absolute left-0 right-0 top-[32px] h-[3px] origin-left rounded-full"
+            className="absolute left-0 right-0 top-[56px] h-[3px] origin-left rounded-full"
             style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-mid), var(--siga-light))" }}
           />
 
@@ -624,29 +622,7 @@ function Slide7() {
             </motion.p>
           </motion.div>
 
-          <motion.div variants={rise} className="w-[380px]">
-            <div className="text-[12px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: "var(--siga-mid)" }}>
-              Parcours conseillé
-            </div>
-            <div className="flex flex-col gap-2">
-              {steps.map((s, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 14 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 + i * 0.07 }}
-                  className="flex items-center gap-3 rounded-xl border bg-white px-4 py-2.5 shadow-sm"
-                  style={{ borderColor: "rgba(30,58,95,0.1)" }}
-                >
-                  <span className="min-w-[28px] text-[12px] font-black" style={{ color: "var(--siga-mid)", opacity: 0.5 }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <ChevronRight size={12} style={{ color: "var(--siga-light)", flexShrink: 0 }} />
-                  <span className="text-[14px] font-bold" style={{ color: "var(--siga-dark)" }}>{s}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          {/* Parcours conseillé retired as requested */}
         </div>
       </div>
     </SlideShell>
@@ -718,9 +694,7 @@ function Slide8() {
           <div className="mt-2 text-[15px] font-medium text-white/50">
             HAMMACHE Amira &amp; HADJI Melissa — Encadrant : M. ACHROUFENE Achour
           </div>
-          <div className="mt-4 rounded-xl px-6 py-2" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <span className="text-[14px] font-bold text-white/50">Place aux questions 💬</span>
-          </div>
+          {/* Place aux questions pill removed per request */}
         </motion.div>
       </div>
     </SlideShell>

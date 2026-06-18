@@ -1,19 +1,19 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-C2XkgND4.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-CKy7OqKV.js
 var tsrStartManifest = () => ({ routes: {
 	__root__: {
 		filePath: "C:/Users/lenovo/Desktop/SIGA_presentation/presentation-siga-diapo-/src/routes/__root.tsx",
 		children: ["/"],
-		preloads: ["/assets/index-CZO052O3.js"],
+		preloads: ["/assets/index-EniDq_cM.js"],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-CZO052O3.js"
+			src: "/assets/index-EniDq_cM.js"
 		} }]
 	},
 	"/": {
 		filePath: "C:/Users/lenovo/Desktop/SIGA_presentation/presentation-siga-diapo-/src/routes/index.tsx",
 		children: void 0,
-		preloads: ["/assets/routes-Brq9G5K3.js"]
+		preloads: ["/assets/routes-BQY6icu4.js"]
 	}
 } });
 //#endregion

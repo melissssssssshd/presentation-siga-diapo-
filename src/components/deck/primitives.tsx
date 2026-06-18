@@ -85,7 +85,7 @@ export function YkonMark({ variant = "dark" }: { variant?: "dark" | "light" }) {
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
         <path d="M3 3l6 6 6-6M9 9v6" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
-      EURL YKON
+      {/* EURL YKON removed as requested */}
     </div>
   );
 }
