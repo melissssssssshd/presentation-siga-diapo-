@@ -161,23 +161,23 @@ function Slide2() {
           </motion.div>
         </div>
 
-        <div className="mt-10 grid flex-1 grid-cols-2 gap-5">
+        <div className="mt-8 grid flex-1 grid-cols-2 gap-4">
           {sections.map((s, i) => (
             <motion.div
               key={s.n}
               variants={rise}
-              className="group flex items-start gap-5 rounded-2xl border bg-white/70 px-7 py-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group flex items-start gap-4 rounded-2xl border bg-white/70 px-5 py-4 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg"
               style={{ borderColor: "rgba(30,58,95,0.1)" }}
             >
               <div
-                className="text-[44px] font-black leading-none transition-opacity"
-                style={{ color: "var(--siga-mid)", opacity: 0.15 }}
+                className="text-[34px] font-black leading-none flex-none transition-opacity"
+                style={{ color: "var(--siga-mid)", opacity: 0.13 }}
               >
                 {s.n}
               </div>
               <div>
-                <div className="text-[20px] font-bold" style={{ color: "var(--siga-dark)" }}>{s.t}</div>
-                <div className="mt-2 text-[14px] font-medium leading-snug" style={{ color: "var(--siga-dark)", opacity: 0.65 }}>{s.d}</div>
+                <div className="text-[17px] font-bold" style={{ color: "var(--siga-dark)" }}>{s.t}</div>
+                <div className="mt-1.5 text-[13px] font-medium leading-snug" style={{ color: "var(--siga-dark)", opacity: 0.65 }}>{s.d}</div>
               </div>
             </motion.div>
           ))}
@@ -273,21 +273,21 @@ function Slide3() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.35 + i * 0.15 }}
-                      className="flex flex-col rounded-2xl p-5"
+                      className="flex flex-col rounded-xl p-4"
                       style={{
                         background: s.highlight ? "var(--siga-dark)" : "white",
                         border: s.highlight ? "none" : "1px solid rgba(30,58,95,0.1)",
                         boxShadow: s.highlight
-                          ? "0 0 0 1px rgba(107,163,214,0.3), 0 12px 32px -8px rgba(30,58,95,0.35)"
+                          ? "0 0 0 1px rgba(107,163,214,0.3), 0 10px 24px -8px rgba(30,58,95,0.35)"
                           : "0 1px 4px rgba(30,58,95,0.06)",
-                        minWidth: "155px",
+                        minWidth: "138px",
                       }}
                     >
-                      <div className="text-[26px] mb-2">{s.emoji}</div>
-                      <div className="text-[15px] font-bold" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>
+                      <div className="text-[13px] mb-1.5 opacity-60" style={{ color: s.highlight ? "white" : "var(--siga-mid)" }}>{s.emoji}</div>
+                      <div className="text-[14px] font-bold" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>
                         {s.label}
                       </div>
-                      <div className="mt-1 text-[12px] font-medium leading-snug" style={{ color: s.highlight ? "rgba(255,255,255,0.6)" : "var(--siga-dark)", opacity: s.highlight ? 1 : 0.6 }}>
+                      <div className="mt-1 text-[11px] font-medium leading-snug" style={{ color: s.highlight ? "rgba(255,255,255,0.6)" : "var(--siga-dark)", opacity: s.highlight ? 1 : 0.6 }}>
                         {s.desc}
                       </div>
                     </motion.div>
@@ -297,10 +297,10 @@ function Slide3() {
                         animate={{ opacity: 1, scaleX: 1 }}
                         transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}
                         style={{ transformOrigin: "left" }}
-                        className="mx-3 flex items-center"
+                        className="mx-2.5 flex items-center"
                       >
-                        <div className="h-0.5 w-7 rounded-full" style={{ background: "var(--siga-light)" }} />
-                        <ChevronRight size={15} style={{ color: "var(--siga-light)", marginLeft: "-3px" }} />
+                        <div className="h-0.5 w-6 rounded-full" style={{ background: "var(--siga-light)" }} />
+                        <ChevronRight size={13} style={{ color: "var(--siga-light)", marginLeft: "-3px" }} />
                       </motion.div>
                     )}
                   </div>
@@ -336,21 +336,21 @@ function Slide4() {
           Problématique<span style={{ color: "var(--siga-mid)" }}>.</span>
         </motion.h2>
 
-        <div className="mt-8 grid flex-1 grid-cols-2 gap-5">
+        <div className="mt-6 grid flex-1 grid-cols-2 gap-4">
           {problems.map((p, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: i % 2 === 0 ? -16 : 16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
-              className="siga-card flex items-start gap-5 p-7 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="siga-card flex items-start gap-4 p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
-              <div className="grid h-12 w-12 flex-none place-items-center rounded-xl" style={{ background: "var(--siga-dark)", color: "white" }}>
-                <p.icon size={22} />
+              <div className="grid h-10 w-10 flex-none place-items-center rounded-xl" style={{ background: "var(--siga-dark)", color: "white" }}>
+                <p.icon size={18} />
               </div>
               <div>
-                <div className="text-[19px] font-bold" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
-                <div className="mt-2 text-[15px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.75 }}>{p.text}</div>
+                <div className="text-[17px] font-bold" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
+                <div className="mt-1.5 text-[13px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.75 }}>{p.text}</div>
               </div>
             </motion.div>
           ))}
@@ -376,29 +376,25 @@ function Slide5() {
       icon: Cloud,
       title: "Architecture SaaS",
       sub: "Multi-entreprises • Sécurisée • Évolutive",
-      proof: "Déployée sur Railway · isolation par tenant · scalable à la demande",
-      proofIcon: "🚀",
+      proof: "Railway · isolation tenant · scalable à la demande",
     },
     {
       icon: Shield,
       title: "Conformité",
-      sub: "Législation algérienne CNAS, IRG, DAS",
-      proof: "Calcul CNAS 9%/26% · IRG barème progressif · déclarations DAS",
-      proofIcon: "⚖️",
+      sub: "CNAS, IRG, DAS — Législation algérienne",
+      proof: "CNAS 9%/26% · IRG barème progressif · DAS",
     },
     {
       icon: Bot,
-      title: "Intelligence",
+      title: "Intelligence IA",
       sub: "Assistant IA • Automatisation • Prédictif",
-      proof: "Chatbot Llama 3.3 70B via Groq · tool calling sécurisé",
-      proofIcon: "🤖",
+      proof: "Llama 3.3 70B via Groq · tool calling sécurisé",
     },
     {
       icon: Users,
       title: "Collaboration",
       sub: "Messagerie • Workflows • Notifications",
-      proof: "Messagerie temps réel cloisonnée · notifications RH automatisées",
-      proofIcon: "💬",
+      proof: "Messagerie temps réel cloisonnée · notifs auto",
     },
   ];
 
@@ -447,26 +443,26 @@ function Slide5() {
         </div>
 
         {/* 4 pillar cards */}
-        <div className="mt-5 grid flex-1 grid-cols-4 gap-4">
+        <div className="mt-4 grid flex-1 grid-cols-4 gap-3">
           {pillars.map((p, i) => (
             <motion.div
               key={p.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.15 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="siga-card flex flex-col items-center p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="siga-card flex flex-col items-center p-4 text-center transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="grid h-14 w-14 place-items-center rounded-2xl" style={{ background: "var(--siga-dark)", color: "white" }}>
-                <p.icon size={26} />
+              <div className="grid h-11 w-11 place-items-center rounded-xl" style={{ background: "var(--siga-dark)", color: "white" }}>
+                <p.icon size={20} />
               </div>
-              <div className="mt-4 text-[17px] font-bold leading-snug" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
-              <div className="mt-1.5 text-[12px] font-semibold leading-snug" style={{ color: "var(--siga-mid)" }}>{p.sub}</div>
-              <div className="my-3 h-px w-full rounded-full" style={{ background: "rgba(30,58,95,0.08)" }} />
+              <div className="mt-3 text-[15px] font-bold leading-snug" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
+              <div className="mt-1 text-[11px] font-semibold leading-snug" style={{ color: "var(--siga-mid)" }}>{p.sub}</div>
+              <div className="my-2.5 h-px w-full rounded-full" style={{ background: "rgba(30,58,95,0.08)" }} />
               <div
-                className="w-full rounded-xl px-3 py-2.5 text-left text-[11px] font-semibold leading-snug"
+                className="w-full rounded-lg px-2.5 py-2 text-left text-[10px] font-semibold leading-snug"
                 style={{ background: "var(--siga-cream)", color: "var(--siga-dark)" }}
               >
-                <span className="mr-1">{p.proofIcon}</span>{p.proof}
+                {p.proof}
               </div>
             </motion.div>
           ))}
@@ -475,13 +471,13 @@ function Slide5() {
         {/* bottom checkmarks bar */}
         <motion.div
           variants={rise}
-          className="mt-3 flex items-center justify-center gap-8 rounded-2xl py-3"
+          className="mt-2.5 flex items-center justify-center gap-6 rounded-xl py-2.5"
           style={{ background: "var(--siga-dark)" }}
         >
           {checks.map((item) => (
-            <div key={item} className="flex items-center gap-2">
-              <Check size={13} className="text-white/60" />
-              <span className="text-[12px] font-bold uppercase tracking-wider text-white">{item}</span>
+            <div key={item} className="flex items-center gap-1.5">
+              <Check size={11} className="text-white/60" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white">{item}</span>
             </div>
           ))}
         </motion.div>
