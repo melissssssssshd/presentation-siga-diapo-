@@ -86,7 +86,7 @@ function Slide1() {
             style={{ borderColor: "rgba(30,58,95,0.1)" }}
           >
             {[
-              { k: "Réalisé par", v: "HAMMACHE Amira", v2: "HADJI Melissa" },
+              { k: "Réalisé par", v: "HAMMACHE Amira", v2: "HADJI Melissaaaaa" },
               { k: "Encadrant", v: "M. ACHROUFENE Achour", v2: "Soutenance de Master" },
             ].map((item) => (
               <div key={item.k} className="border-r px-10 py-5 text-left last:border-0" style={{ borderColor: "rgba(30,58,95,0.05)" }}>
