@@ -281,7 +281,7 @@ export function getSlide3Advance() { return _slide3Advance; }
 export function getSlide3GoBack() { return _slide3GoBack; }
 
 const CONTEXT_INTRO =
-  "Tissu de PME algérien dense et en croissance constante, mais sans solution RH adaptée";
+  "Les PME algériennes se multiplient, sans que les outils RH suivent le rythme";
 
 const LACUNES = [
   "Gestion Manuelle",
