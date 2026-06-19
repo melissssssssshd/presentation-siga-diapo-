@@ -45,11 +45,11 @@ export function Eyebrow({ children, theme = "light" }: { children: ReactNode; th
   return (
     <motion.div
       variants={rise}
-      className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]"
+      className="inline-flex items-center gap-2 text-[16px] font-semibold uppercase tracking-[0.18em]"
       style={{ color: theme === "dark" ? "var(--siga-light)" : "var(--siga-mid)" }}
     >
       <span
-        className="inline-block h-1.5 w-1.5 rounded-full"
+        className="inline-block h-2 w-2 rounded-full"
         style={{ background: "currentColor" }}
       />
       {children}

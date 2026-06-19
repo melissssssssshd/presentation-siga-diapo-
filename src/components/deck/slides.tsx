@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence, useAnimation, type Variants } from "framer-motion";
+import { useState, useCallback } from "react";
 import {
   Users, Cloud, Bot, Shield, Check, X,
   Sparkles, Smartphone, TrendingUp, Mic,
-  ChevronRight, Zap, Target, FileText,
+  ChevronRight, Zap, Target, FileText, PlayCircle,
 } from "lucide-react";
 import { SlideShell, Eyebrow, Logo, rise } from "./primitives";
 import type { ComponentType } from "react";
@@ -21,7 +21,7 @@ function SlideNumber({ n, total, dark = false }: { n: number; total: number; dar
   );
 }
 
-const TOTAL = 8;
+const TOTAL = 7;
 
 /* ══════════════════════════════════════════════════════════════
    SLIDE 1 — PAGE DE TITRE
@@ -49,7 +49,7 @@ function Slide1() {
 
           <motion.h1
             variants={rise}
-            className="mt-8 max-w-5xl text-[62px] font-bold leading-[1.05] tracking-[-0.04em]"
+            className="mt-8 max-w-5xl text-[54px] font-bold leading-[1.05] tracking-[-0.04em]"
             style={{ color: "var(--siga-dark)" }}
           >
             SIGA — Système Intégré de
@@ -108,321 +108,480 @@ function Slide1() {
 
 /* ══════════════════════════════════════════════════════════════
    SLIDE 2 — SOMMAIRE
+   Navigation par flèche uniquement (révélation carte par carte)
 ══════════════════════════════════════════════════════════════ */
-function Slide2() {
-  const sections = [
-    {
-      n: "01",
-      t: "Contexte & Problématique",
-      d: "Les défis de la digitalisation RH dans les entreprises algériennes et la solution SIGA",
-    },
-    {
-      n: "02",
-      t: "Architecture & Méthodologie",
-      d: "Stack technique moderne et approche agile Scrum",
-    },
-    {
-      n: "03",
-      t: "Modules Fonctionnels",
-      d: "Onboarding, gestion RH, pointage QR et module de paie",
-    },
-    {
-      n: "04",
-      t: "Intelligence Artificielle",
-      d: "Assistant IA conversationnel, messagerie interne et intelligence métier prédictive",
-    },
-  ];
+const SOMMAIRE_SECTIONS = [
+  {
+    n: "01",
+    icon: Target,
+    t: "Contexte & Problématique",
+    d: "Les défis de la digitalisation RH en Algérie",
+  },
+  {
+    n: "02",
+    icon: Zap,
+    t: "Solution",
+    d: "SIGA : plateforme SaaS RH cloud-native conforme et intelligente",
+  },
+  {
+    n: "03",
+    icon: FileText,
+    t: "Méthodologie",
+    d: "Approche Scrum agile en 6 sprints — stack technique moderne",
+  },
+  {
+    n: "04",
+    icon: PlayCircle,
+    t: "Présentation Vidéo",
+    d: "Démonstration complète de la plateforme SIGA (6 minutes)",
+  },
+  {
+    n: "05",
+    icon: Check,
+    t: "Conclusion",
+    d: "Bilan, perspectives et ouverture vers les questions",
+  },
+];
 
-  const reveal = {
-    hidden: { opacity: 0, x: 14 },
-    show: (i: number) => ({ opacity: 1, x: 0, transition: { duration: 0.45, delay: i * 0.08 } }),
+// This state is managed externally so Deck can drive it via arrow keys
+// We export a ref-based mechanism through a shared module
+let _slide2Advance: (() => boolean) | null = null;
+let _slide2GoBack: (() => boolean) | null = null;
+
+export function getSlide2Advance() { return _slide2Advance; }
+export function getSlide2GoBack() { return _slide2GoBack; }
+
+function Slide2() {
+  const [visible, setVisible] = useState(0);
+
+  // Register advance/back callbacks for Deck to call
+  _slide2Advance = () => {
+    if (visible < SOMMAIRE_SECTIONS.length - 1) {
+      setVisible((v) => v + 1);
+      return true; // consumed the event (don't go to next slide)
+    }
+    return false; // let Deck navigate to next slide
+  };
+  _slide2GoBack = () => {
+    if (visible > 0) {
+      setVisible((v) => v - 1);
+      return true;
+    }
+    return false;
   };
 
-  const [visible, setVisible] = useState(1);
+  const reveal: Variants = {
+    hidden: { opacity: 0, x: 30, scale: 0.96 },
+    show: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  };
 
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-30" />
       <SlideNumber n={2} total={TOTAL} />
 
-      <div className="relative flex h-full flex-col px-20 py-16">
-        <div className="flex items-end justify-between">
+      <div className="relative flex h-full flex-col px-20 py-14">
+        {/* Header */}
+        <motion.div variants={rise} className="flex items-end justify-between mb-10">
           <div>
-            <motion.div
-              variants={rise}
-              className="inline-flex items-center gap-2 text-[15px] font-bold uppercase tracking-[0.2em]"
-              style={{ color: "var(--siga-mid)" }}
-            >
-              <span className="inline-block h-2 w-2 rounded-full" style={{ background: "currentColor" }} />
-              Sommaire
-            </motion.div>
-            <motion.h2
-              variants={rise}
-              className="mt-6 text-[48px] font-bold leading-[1.05] tracking-[-0.035em]"
+            <Eyebrow>Sommaire</Eyebrow>
+            <h2
+              className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
               style={{ color: "var(--siga-dark)" }}
             >
               Plan de la
               <br />
               <span style={{ color: "var(--siga-mid)" }}>Présentation.</span>
-            </motion.h2>
+            </h2>
           </div>
-          <motion.div
-            variants={rise}
-            className="max-w-xs text-right text-[16px] font-medium leading-relaxed"
-            style={{ color: "var(--siga-dark)" }}
-          >
-            Présenter une solution SaaS RH complète, conforme à la réglementation algérienne et enrichie par l'IA.
-          </motion.div>
-        </div>
-          <div
-            className="mt-16 grid grid-cols-2 gap-6 cursor-pointer"
-            onClick={() => setVisible((v: number) => Math.min(sections.length, v + 1))}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setVisible((v: number) => Math.min(sections.length, v + 1));
-              }
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            {sections.map((s, i) => (
+        </motion.div>
+
+        {/* Cards grid */}
+        <div className="grid grid-cols-5 gap-5 flex-1 items-stretch">
+          {SOMMAIRE_SECTIONS.map((s, i) => {
+            const Icon = s.icon;
+            const isVisible = i <= visible;
+            const isActive = i === visible;
+            return (
               <motion.div
                 key={s.n}
                 initial="hidden"
-                animate={i < visible ? "show" : "hidden"}
+                animate={isVisible ? "show" : "hidden"}
                 variants={reveal}
-                custom={i}
-                className="flex gap-6 rounded-2xl border bg-white/60 p-6 backdrop-blur-sm shadow-lg"
-                style={{ borderColor: "rgba(30,58,95,0.1)" }}
+                className="flex flex-col rounded-3xl border p-7 transition-all duration-300"
+                style={{
+                  background: "white",
+                  borderColor: isActive ? "var(--siga-mid)" : "rgba(30,58,95,0.1)",
+                  borderWidth: isActive ? "2px" : "1px",
+                  boxShadow: isActive
+                    ? "0 16px 36px -10px rgba(30,58,95,0.18), 0 0 0 0 transparent"
+                    : "0 2px 8px rgba(30,58,95,0.06)",
+                  transform: isActive ? "translateY(-6px)" : "translateY(0)",
+                }}
               >
+                {/* Number */}
                 <div
-                  className="text-[40px] font-black leading-none"
-                  style={{ color: "var(--siga-mid)" }}
+                  className="text-[40px] font-black leading-none mb-4"
+                  style={{ color: isActive ? "var(--siga-mid)" : "rgba(30,58,95,0.15)" }}
                 >
                   {s.n}
                 </div>
-                <div>
-                  <div className="text-[20px] font-bold" style={{ color: "var(--siga-dark)" }}>{s.t}</div>
-                  <div className="mt-2 text-[16px] font-medium leading-snug" style={{ color: "var(--siga-dark)" }}>{s.d}</div>
+                {/* Icon */}
+                <div
+                  className="mb-5 grid h-12 w-12 place-items-center rounded-2xl"
+                  style={{
+                    background: isActive ? "var(--siga-dark)" : "var(--siga-bg)",
+                    color: isActive ? "white" : "var(--siga-mid)",
+                  }}
+                >
+                  <Icon size={22} />
+                </div>
+                {/* Title */}
+                <div
+                  className="text-[20px] font-black leading-tight tracking-[-0.02em]"
+                  style={{ color: "var(--siga-dark)" }}
+                >
+                  {s.t}
+                </div>
+                {/* Description */}
+                <div
+                  className="mt-3 text-[13px] font-medium leading-snug"
+                  style={{ color: "rgba(30,58,95,0.55)" }}
+                >
+                  {s.d}
                 </div>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
+
+        {/* Hint */}
+        <motion.div
+          variants={rise}
+          className="mt-6 text-center text-[11px] font-bold uppercase tracking-[0.25em]"
+          style={{ color: "var(--siga-dark)", opacity: 0.3 }}
+        >
+          {visible < SOMMAIRE_SECTIONS.length - 1
+            ? `${SOMMAIRE_SECTIONS.length - 1 - visible} section(s) restante(s)`
+            : "Appuyez sur → pour continuer"}
+        </motion.div>
       </div>
     </SlideShell>
   );
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 3 — CONTEXTE (asymétrique)
+   SLIDE 3 — CONTEXTE & PROBLÉMATIQUE
+   Transition : porte tournante (spinning door) sur axe vertical central
 ══════════════════════════════════════════════════════════════ */
+let _slide3Advance: (() => boolean) | null = null;
+let _slide3GoBack: (() => boolean) | null = null;
+
+export function getSlide3Advance() { return _slide3Advance; }
+export function getSlide3GoBack() { return _slide3GoBack; }
+
+const contextSteps = [
+  {
+    emoji: "📊",
+    label: "Excel & papier",
+    desc: "Suivi manuel, erreurs fréquentes, zéro traçabilité",
+    arrow: true,
+    highlight: false,
+  },
+  {
+    emoji: "💰",
+    label: "ERP coûteux",
+    desc: "SAP, Oracle — inadaptés, hors budget PME algériennes",
+    arrow: true,
+    highlight: false,
+  },
+  {
+    emoji: "✦",
+    label: "SIGA",
+    desc: "Solution locale, accessible, conforme et intelligente",
+    arrow: false,
+    highlight: true,
+  },
+];
+
+const problems = [
+  { t: "Gestion Manuelle", d: "Saisie manuelle des bulletins de paie, suivi des absences sur Excel, calcul des cotisations sociales sujet aux erreurs." },
+  { t: "Solutions Fragmentées", d: "Absence de solutions intégrées adaptées au contexte algérien. Les ERP (SAP, Oracle) sont trop coûteux pour les PME." },
+  { t: "Conformité Réglementaire", d: "Difficultés à assurer la conformité avec les évolutions fréquentes du cadre légal (CNAS, impôts, déclarations sociales)." },
+  { t: "Manque d'Automatisation", d: "Les solutions existantes n'exploitent pas les technologies intelligentes." },
+];
+
 function Slide3() {
-  const steps = [
-    {
-      emoji: "📊",
-      label: "Excel & papier",
-      desc: "Suivi manuel, erreurs fréquentes, zéro traçabilité",
-      arrow: true,
-      highlight: false,
-    },
-    {
-      emoji: "💰",
-      label: "ERP coûteux",
-      desc: "SAP, Oracle — inadaptés, hors budget PME algériennes",
-      arrow: true,
-      highlight: false,
-    },
-    {
-      emoji: "✦",
-      label: "SIGA",
-      desc: "Solution locale, accessible, conforme et intelligente",
-      arrow: false,
-      highlight: true,
-    },
-  ];
+  const [tab, setTab] = useState<"context" | "problems">("context");
+  const [dir, setDir] = useState<1 | -1>(1); // 1 = forward (→), -1 = backward (←)
+  const [probStep, setProbStep] = useState(0);
+
+  // ── Animation controllers ──────────────────────────────────
+  const panelCtrl = useAnimation(); // the content flip
+
+  // Sequence: content page-turns with slow crossfade
+  const switchTab = useCallback(async (next: "context" | "problems", direction: 1 | -1) => {
+    setDir(direction);
+
+    // 1. Content softly folds away — slower, deeper rotation + fade + blur
+    await panelCtrl.start({
+      rotateY: direction * 22,
+      x: direction * -40,
+      opacity: 0,
+      scale: 0.96,
+      filter: "blur(4px)",
+      transition: { duration: 0.55, ease: [0.4, 0, 0.6, 1] },
+    });
+
+    // 2. Small breathing pause
+    await new Promise(r => setTimeout(r, 100));
+
+    // 3. Swap content (invisible)
+    setTab(next);
+
+    // 4. Position new content on the opposite side
+    panelCtrl.set({
+      rotateY: direction * -22,
+      x: direction * 40,
+      opacity: 0,
+      scale: 0.96,
+      filter: "blur(4px)",
+    });
+
+    // 5. New content gracefully unfolds in
+    panelCtrl.start({
+      rotateY: 0,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+      transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+    });
+  }, [panelCtrl]);
+
+  // Register callbacks for Deck arrow-key navigation
+  _slide3Advance = () => {
+    if (tab === "context") { 
+      setProbStep(0);
+      switchTab("problems", 1); 
+      return true; 
+    }
+    if (tab === "problems" && probStep < 6) {
+      setProbStep(p => p + 1);
+      return true;
+    }
+    return false;
+  };
+  _slide3GoBack = () => {
+    if (tab === "problems") { 
+      if (probStep > 0) {
+        setProbStep(p => p - 1);
+        return true;
+      }
+      switchTab("context", -1); 
+      return true; 
+    }
+    return false;
+  };
 
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-25" />
       <SlideNumber n={3} total={TOTAL} />
 
-      <div className="relative flex h-full flex-col px-16 py-14 justify-center">
-        <Eyebrow>Partie 1</Eyebrow>
+      <div className="relative flex h-full flex-col px-16 py-14">
 
-        <div className="mt-5 flex flex-1 gap-14">
-          {/* LEFT — big stat */}
-          <motion.div variants={rise} className="flex w-[320px] flex-none flex-col justify-center">
-            <div
-              className="text-[108px] font-black leading-none tracking-[-0.05em]"
-              style={{
-                background: "linear-gradient(135deg, var(--siga-dark) 0%, var(--siga-mid) 100%)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              97%
-            </div>
-            <div className="mt-3 text-[18px] font-bold leading-snug" style={{ color: "var(--siga-dark)" }}>
-              des PME algériennes gèrent leur RH sans outil digital dédié.
-            </div>
-            <div className="mt-4 text-[12px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--siga-mid)", opacity: 0.7 }}>
-              Source : analyse de marché — mémoire SIGA 2026
-            </div>
-            <div className="mt-5 h-1 w-14 rounded-full" style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-light))" }} />
-          </motion.div>
-
-          {/* RIGHT — text + frise */}
-          <div className="flex flex-1 flex-col justify-between">
-            <div>
-              <motion.h2
-                variants={rise}
-                className="text-[46px] font-bold leading-[1.05] tracking-[-0.035em]"
-                style={{ color: "var(--siga-dark)" }}
-              >
-                Contexte<span style={{ color: "var(--siga-mid)" }}>.</span>
-              </motion.h2>
-              <motion.p variants={rise} className="mt-4 max-w-xl text-[17px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>
-                La digitalisation RH progresse en Algérie, mais les PME restent largement sur Excel et papier. Les ERP existants (SAP, Oracle) sont trop coûteux et peu adaptés au contexte local. Il existe un besoin réel de solutions RH accessibles, modernes et conformes à la réglementation algérienne.
-              </motion.p>
-            </div>
-
-            {/* frise progression */}
-            <motion.div variants={rise} className="mb-2">
-              <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--siga-mid)", opacity: 0.6 }}>
-                Progression du marché
-              </div>
-              <div className="flex items-center">
-                {steps.map((s, i) => (
-                  <div key={i} className="flex items-center">
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.35 + i * 0.15 }}
-                      className="flex flex-col rounded-xl p-4"
-                      style={{
-                        background: s.highlight ? "var(--siga-dark)" : "white",
-                        border: s.highlight ? "none" : "1px solid rgba(30,58,95,0.1)",
-                        boxShadow: s.highlight
-                          ? "0 0 0 1px rgba(107,163,214,0.3), 0 10px 24px -8px rgba(30,58,95,0.35)"
-                          : "0 1px 4px rgba(30,58,95,0.06)",
-                        minWidth: "138px",
-                      }}
-                    >
-                      <div className="text-[13px] mb-1.5 opacity-60" style={{ color: s.highlight ? "white" : "var(--siga-mid)" }}>{s.emoji}</div>
-                      <div className="text-[14px] font-bold" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>
-                        {s.label}
-                      </div>
-                      <div className="mt-1 text-[11px] font-medium leading-snug" style={{ color: s.highlight ? "rgba(255,255,255,0.6)" : "var(--siga-dark)", opacity: s.highlight ? 1 : 0.6 }}>
-                        {s.desc}
-                      </div>
-                    </motion.div>
-                    {s.arrow && (
-                      <motion.div
-                        initial={{ opacity: 0, scaleX: 0 }}
-                        animate={{ opacity: 1, scaleX: 1 }}
-                        transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}
-                        style={{ transformOrigin: "left" }}
-                        className="mx-2.5 flex items-center"
-                      >
-                        <div className="h-0.5 w-6 rounded-full" style={{ background: "var(--siga-light)" }} />
-                        <ChevronRight size={13} style={{ color: "var(--siga-light)", marginLeft: "-3px" }} />
-                      </motion.div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    </SlideShell>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SLIDE 4 — PROBLÉMATIQUE
-══════════════════════════════════════════════════════════════ */
-function Slide4() {
-  const problems = [
-    { t: "Gestion Manuelle", d: "Saisie manuelle des bulletins de paie, suivi des absences sur Excel, calcul des cotisations sociales sujet aux erreurs." },
-    { t: "Solutions Fragmentées", d: "Absence de solutions intégrées adaptées au contexte algérien. Les ERP (SAP, Oracle) sont trop coûteux pour les PME." },
-    { t: "Conformité Réglementaire", d: "Difficultés à assurer la conformité avec les évolutions fréquentes du cadre légal (CNAS, impôts, déclarations sociales)." },
-    { t: "Manque d'Automatisation", d: "Les solutions existantes n'exploitent pas les technologies intelligentes." }
-  ];
-
-  return (
-    <SlideShell>
-      <div className="siga-grid-bg absolute inset-0 opacity-25" />
-      <SlideNumber n={4} total={TOTAL} />
-
-      <div className="relative grid h-full grid-cols-12 gap-12 px-20 py-16">
-        <div className="col-span-5 flex flex-col justify-between">
+        {/* ── Header (fixed — doesn't transition) ─────────── */}
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <Eyebrow>Problématique</Eyebrow>
-            <motion.h2
-              variants={rise}
-              className="mt-6 text-[48px] font-bold leading-[1.05] tracking-[-0.035em]"
+            <Eyebrow>Analyse du Marché</Eyebrow>
+            <h2
+              className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
               style={{ color: "var(--siga-dark)" }}
             >
-              Les Défis RH
-              <br />
-              <span style={{ color: "var(--siga-mid)" }}>en Algérie.</span>
-            </motion.h2>
-            <motion.p
-              variants={rise}
-              className="mt-6 text-[16px] leading-relaxed"
-              style={{ color: "var(--siga-mid)" }}
-            >
-              Les entreprises algériennes, particulièrement les PME, font face à des lacunes critiques :
-            </motion.p>
+              {tab === "context" ? (
+                <>Contexte<br /><span style={{ color: "var(--siga-mid)" }}>du Marché.</span></>
+              ) : (
+                <>Problé<span style={{ color: "var(--siga-mid)" }}>matique.</span></>
+              )}
+            </h2>
           </div>
 
-          <motion.div
-            variants={rise}
-            className="rounded-2xl border p-6"
-            style={{ borderColor: "rgba(30,58,95,0.1)", background: "var(--siga-bg)" }}
-          >
-            <div className="text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: "var(--siga-dark)" }}>
-              Impact sur les PME
-            </div>
-            <div className="mt-4 space-y-3">
-              {[
-                { l: "Perte de productivité", v: "Élevée", c: "var(--siga-dark)" },
-                { l: "Risque d'erreurs", v: "Élevé", c: "var(--siga-mid)" },
-                { l: "Visibilité décisionnelle", v: "Faible", c: "var(--siga-dark)" }
-              ].map((item) => (
-                <div key={item.l} className="flex justify-between border-b pb-1 last:border-0" style={{ borderColor: "rgba(30,58,95,0.1)" }}>
-                  <span className="text-[14px] font-medium" style={{ color: "var(--siga-dark)" }}>{item.l}</span>
-                  <span className="text-[13px] font-bold" style={{ color: item.c }}>{item.v}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </div>
 
-        <div className="col-span-7 flex flex-col justify-center gap-4">
-          {problems.map((b, i) => (
-            <motion.div
-              key={b.t}
-              variants={rise}
-              className="siga-card group flex items-start gap-4 p-5 transition hover:translate-x-1"
-            >
-              <div className="mt-1 flex-none rounded-full p-1" style={{ background: "var(--siga-bg)", color: "var(--siga-mid)" }}>
-                <X size={16} />
-              </div>
-              <div>
-                <div className="text-[18px] font-bold tracking-tight" style={{ color: "var(--siga-dark)" }}>{b.t}</div>
-                <div className="mt-1 text-[14px] leading-snug" style={{ color: "var(--siga-mid)" }}>{b.d}</div>
-              </div>
-            </motion.div>
-          ))}
+        {/* ── Stage : perspective container ──────────────── */}
+        <div
+          className="flex-1 relative overflow-hidden"
+          style={{ perspective: "1400px", perspectiveOrigin: "50% 50%" }}
+        >
+          {/* CONTENT PANEL — flips slowly */}
           <motion.div
-            variants={rise}
-            className="mt-2 text-[15px] font-bold text-center p-3 rounded-lg bg-[color:var(--siga-dark)] text-white"
+            animate={panelCtrl}
+            initial={{ rotateY: 0, opacity: 1 }}
+            style={{
+              transformStyle: "preserve-3d",
+              backfaceVisibility: "hidden",
+              transformOrigin: "50% 50%",
+              position: "absolute",
+              inset: 0,
+            }}
           >
-            Constat : Aucune solution ne réunit conformité locale + automatisation + UX moderne
+            {tab === "context" ? (
+              /* ── CONTEXTE content ─────────────────────── */
+              <div className="flex h-full gap-14">
+                {/* LEFT — big stat */}
+                <div className="flex w-[300px] flex-none flex-col justify-center">
+                  <div
+                    className="text-[100px] font-black leading-none tracking-[-0.05em]"
+                    style={{
+                      background: "linear-gradient(135deg, var(--siga-dark) 0%, var(--siga-mid) 100%)",
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    97%
+                  </div>
+                  <div className="mt-3 text-[18px] font-bold leading-snug" style={{ color: "var(--siga-dark)" }}>
+                    des PME algériennes gèrent leur RH sans outil digital dédié.
+                  </div>
+                  <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--siga-mid)", opacity: 0.7 }}>
+                    Source : analyse de marché — mémoire SIGA 2026
+                  </div>
+                  <div className="mt-5 h-1 w-14 rounded-full" style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-light))" }} />
+                </div>
+
+                {/* RIGHT — text + frise */}
+                <div className="flex flex-1 flex-col justify-between">
+                  <p className="max-w-2xl text-[17px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>
+                    La digitalisation RH progresse en Algérie, mais les PME restent largement sur Excel et papier.
+                    Les ERP existants (SAP, Oracle) sont trop coûteux et peu adaptés au contexte local.
+                    Il existe un besoin réel de solutions RH accessibles, modernes et conformes à la réglementation algérienne.
+                  </p>
+
+                  {/* frise progression */}
+                  <div className="mb-2">
+                    <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--siga-dark)", opacity: 0.6 }}>
+                      Progression du marché
+                    </div>
+                    <div className="flex items-center">
+                      {contextSteps.map((s, i) => (
+                        <div key={i} className="flex items-center">
+                          <div
+                            className="flex flex-col rounded-xl p-4"
+                            style={{
+                              background: s.highlight ? "var(--siga-dark)" : "white",
+                              border: s.highlight ? "none" : "1px solid rgba(30,58,95,0.1)",
+                              boxShadow: s.highlight
+                                ? "0 0 0 1px rgba(107,163,214,0.3), 0 10px 24px -8px rgba(30,58,95,0.35)"
+                                : "0 1px 4px rgba(30,58,95,0.06)",
+                              minWidth: "138px",
+                            }}
+                          >
+                            <div className="text-[13px] mb-1.5 opacity-60" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>{s.emoji}</div>
+                            <div className="text-[14px] font-bold" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>{s.label}</div>
+                            <div className="mt-1 text-[11px] font-medium leading-snug"
+                              style={{ color: s.highlight ? "rgba(255,255,255,0.6)" : "var(--siga-dark)", opacity: s.highlight ? 1 : 0.6 }}>
+                              {s.desc}
+                            </div>
+                          </div>
+                          {s.arrow && (
+                            <div className="mx-2.5 flex items-center">
+                              <div className="h-0.5 w-6 rounded-full" style={{ background: "var(--siga-light)" }} />
+                              <ChevronRight size={13} style={{ color: "var(--siga-light)", marginLeft: "-3px" }} />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── PROBLÉMATIQUE content ────────────────── */
+              <div className="relative flex h-full gap-12">
+                {/* LEFT SIDE */}
+                <div className="flex w-[340px] flex-none flex-col py-2">
+                  <div>
+                    <p className="text-[17px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.85 }}>
+                      Les entreprises algériennes, particulièrement les PME, font face à des lacunes critiques :
+                    </p>
+                  </div>
+                </div>
+
+                {/* CENTERED IMPACT CARD */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={{ 
+                    opacity: probStep === 6 ? 1 : 0, 
+                    y: probStep === 6 ? 0 : 30,
+                    scale: probStep === 6 ? 1 : 0.95,
+                    pointerEvents: probStep === 6 ? "auto" : "none"
+                  }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[24px] p-8 shadow-2xl" 
+                  style={{ 
+                    background: "white", 
+                    border: "2px solid rgba(107,163,214,0.15)",
+                    boxShadow: "0 20px 40px -15px rgba(30,58,95,0.2)",
+                    width: "480px" 
+                  }}
+                >
+                  <div className="mb-6 text-center text-[12px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--siga-mid)" }}>
+                    Impact sur les PME
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      { l: "Perte de productivité", v: "Élevée" },
+                      { l: "Risque d'erreurs", v: "Élevé" },
+                      { l: "Visibilité décisionnelle", v: "Faible" }
+                    ].map(item => (
+                      <div key={item.l} className="flex justify-between items-center text-[15px] border-b pb-4 last:border-0 last:pb-0" style={{ borderColor: "rgba(30,58,95,0.06)" }}>
+                        <span className="font-semibold" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>{item.l}</span>
+                        <span className="font-black" style={{ color: "var(--siga-dark)" }}>{item.v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* RIGHT SIDE (CARDS) */}
+                <div className="flex flex-1 flex-col justify-center space-y-3.5">
+                  {problems.map((b, i) => (
+                    <motion.div
+                      key={b.t}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ 
+                        opacity: probStep > i && probStep < 6 ? 1 : 0, 
+                        x: probStep === 6 ? -20 : (probStep > i ? 0 : 20) 
+                      }}
+                      transition={{ duration: 0.4 }}
+                      className="flex items-center gap-5 rounded-[20px] bg-white px-7 py-4 shadow-sm"
+                      style={{ border: "1px solid rgba(30,58,95,0.06)" }}
+                    >
+                      <div className="flex-none rounded-full p-1.5" style={{ background: "var(--siga-bg)", color: "var(--siga-mid)" }}>
+                        <X size={18} strokeWidth={3} />
+                      </div>
+                      <div className="text-[18px] font-bold tracking-tight" style={{ color: "var(--siga-dark)" }}>
+                        {b.t}
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ 
+                      opacity: probStep >= 5 && probStep < 6 ? 1 : 0, 
+                      y: probStep === 6 ? -20 : (probStep >= 5 ? 0 : 20) 
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="mt-3 rounded-[16px] p-4 text-center text-[14px] font-bold text-white shadow-lg"
+                    style={{ background: "var(--siga-dark)" }}
+                  >
+                    Constat : Aucune solution ne réunit conformité locale + automatisation + UX moderne
+                  </motion.div>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
@@ -431,20 +590,20 @@ function Slide4() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 5 — SOLUTION SIGA (style screenshot)
+   SLIDE 4 — SOLUTION SIGA (style screenshot)
 ══════════════════════════════════════════════════════════════ */
-function Slide5() {
+function Slide4() {
   const pillars = [
     { icon: Cloud, title: "Architecture SaaS", desc: "Multi-entreprises • Sécurisée • Évolutive" },
     { icon: Shield, title: "Conformité", desc: "Législation algérienne CNAS, IRG, DAS" },
     { icon: Bot, title: "Intelligence", desc: "Assistant IA • Automatisation • Prédictif" },
-    { icon: Users, title: "Collaboration", desc: "Messagerie • Workflows • Notifications" }
+    { icon: Users, title: "Collaboration", desc: "Messagerie • Workflows • Notifications" },
   ];
 
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-20" />
-      <SlideNumber n={5} total={TOTAL} />
+      <SlideNumber n={4} total={TOTAL} />
 
       <div className="relative flex h-full flex-col px-20 py-16">
         <div className="flex items-end justify-between">
@@ -452,7 +611,7 @@ function Slide5() {
             <Eyebrow>Solution Proposée</Eyebrow>
             <motion.h2
               variants={rise}
-              className="mt-6 text-[48px] font-bold leading-[1.05] tracking-[-0.035em]"
+              className="mt-6 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
               style={{ color: "var(--siga-dark)" }}
             >
               SIGA : La Plateforme
@@ -462,7 +621,7 @@ function Slide5() {
             <motion.p
               variants={rise}
               className="mt-4 text-[16px] font-medium"
-              style={{ color: "var(--siga-mid)" }}
+              style={{ color: "var(--siga-dark)" }}
             >
               Une solution cloud-native, conforme à la réglementation algérienne et enrichie par l'IA.
             </motion.p>
@@ -479,8 +638,8 @@ function Slide5() {
               <div className="grid h-16 w-16 place-items-center rounded-2xl" style={{ background: "var(--siga-dark)", color: "white" }}>
                 <p.icon size={28} />
               </div>
-              <div className="mt-6 text-[20px] font-bold" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
-              <div className="mt-3 text-[14px]" style={{ color: "var(--siga-mid)" }}>{p.desc}</div>
+              <div className="mt-6 text-[22px] font-black" style={{ color: "var(--siga-dark)" }}>{p.title}</div>
+              <div className="mt-3 text-[14px]" style={{ color: "var(--siga-dark)" }}>{p.desc}</div>
             </motion.div>
           ))}
         </div>
@@ -503,9 +662,15 @@ function Slide5() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 6 — APPROCHE SCRUM
+   SLIDE 5 — APPROCHE SCRUM
 ══════════════════════════════════════════════════════════════ */
-function Slide6() {
+let _slide5Advance: (() => boolean) | null = null;
+let _slide5GoBack: (() => boolean) | null = null;
+
+export function getSlide5Advance() { return _slide5Advance; }
+export function getSlide5GoBack() { return _slide5GoBack; }
+
+function Slide5() {
   const sprints = [
     { n: "S0", t: "Planification", d: "2s", sub: "Charte graphique, stack, backlog" },
     { n: "S1", t: "Onboarding", d: "4s", sub: "Auth, abonnements" },
@@ -515,10 +680,27 @@ function Slide6() {
     { n: "S6", t: "Intelligence Métier", d: "4s", sub: "ATS, devis, prédiction" },
   ];
 
+  const [step, setStep] = useState(0);
+
+  _slide5Advance = () => {
+    if (step < sprints.length - 1) {
+      setStep(s => s + 1);
+      return true;
+    }
+    return false;
+  };
+  _slide5GoBack = () => {
+    if (step > 0) {
+      setStep(s => s - 1);
+      return true;
+    }
+    return false;
+  };
+
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-30" />
-      <SlideNumber n={6} total={TOTAL} />
+      <SlideNumber n={5} total={TOTAL} />
 
       <div className="relative flex h-full flex-col px-16 py-14">
         <Eyebrow>Méthodologie Agile</Eyebrow>
@@ -526,7 +708,7 @@ function Slide6() {
         <div>
           <motion.h2
             variants={rise}
-            className="mt-4 text-[46px] font-bold leading-[1.05] tracking-[-0.035em]"
+            className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
             style={{ color: "var(--siga-dark)" }}
           >
             Approche Scrum
@@ -534,8 +716,6 @@ function Slide6() {
             <span style={{ color: "var(--siga-mid)" }}>en 6 sprints.</span>
           </motion.h2>
         </div>
-
-        {/* Scrum pills removed per request */}
 
         {/* sprint timeline */}
         <div className="relative mt-16 flex-1">
@@ -551,21 +731,28 @@ function Slide6() {
             {sprints.map((s, i) => (
               <motion.div
                 key={s.n}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.5 + i * 0.1 }}
+                initial={false}
+                animate={{ 
+                  opacity: i <= step ? 1 : 0, 
+                  y: i <= step ? 0 : 20,
+                  scale: i === step ? 1.05 : (i < step ? 1 : 0.95)
+                }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 className="flex flex-col items-center text-center"
               >
                 <div
-                  className="grid h-[64px] w-[64px] place-items-center rounded-2xl text-[15px] font-bold text-white"
-                  style={{ background: "var(--siga-dark)", boxShadow: "0 0 0 5px var(--siga-cream)" }}
+                  className="grid h-[64px] w-[64px] place-items-center rounded-2xl text-[15px] font-bold text-white transition-colors duration-300"
+                  style={{ 
+                    background: i <= step ? "var(--siga-dark)" : "var(--siga-light)", 
+                    boxShadow: "0 0 0 5px var(--siga-cream)" 
+                  }}
                 >
                   {s.n}
                 </div>
-                <div className="mt-4 text-[13px] font-bold" style={{ color: "var(--siga-dark)" }}>
+                <div className="mt-4 text-[13px] font-bold transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
                   {s.t} ({s.d})
                 </div>
-                <div className="mt-1 text-[12px] font-medium" style={{ color: "var(--siga-mid)" }}>
+                <div className="mt-1 text-[12px] font-medium transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
                   {s.sub}
                 </div>
               </motion.div>
@@ -578,30 +765,19 @@ function Slide6() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 7 — DÉMONSTRATION
+   SLIDE 6 — DÉMONSTRATION
 ══════════════════════════════════════════════════════════════ */
-function Slide7() {
-  const steps = [
-    "Création d'une entreprise",
-    "Ajout d'employés",
-    "Demande de congé",
-    "Pointage",
-    "Gestion de la paie",
-    "Assistant IA",
-    "ATS",
-    "Tableau de bord intelligent",
-  ];
-
+function Slide6() {
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-25" />
-      <SlideNumber n={7} total={TOTAL} />
+      <SlideNumber n={6} total={TOTAL} />
 
       <div className="relative flex h-full flex-col items-center px-16 py-14">
         <Eyebrow>Démonstration</Eyebrow>
         <motion.h2
           variants={rise}
-          className="mt-5 text-[50px] font-bold leading-[1.05] tracking-[-0.035em] text-center"
+          className="mt-5 text-[44px] font-black leading-[1.05] tracking-[-0.04em] text-center"
           style={{ color: "var(--siga-dark)" }}
         >
           Démonstration de la
@@ -621,8 +797,6 @@ function Slide7() {
               Lancer la vidéo (6 minutes)
             </motion.p>
           </motion.div>
-
-          {/* Parcours conseillé retired as requested */}
         </div>
       </div>
     </SlideShell>
@@ -630,9 +804,9 @@ function Slide7() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 8 — CONCLUSION + MERCI
+   SLIDE 7 — CONCLUSION + MERCI
 ══════════════════════════════════════════════════════════════ */
-function Slide8() {
+function Slide7() {
   const perspectives = [
     { icon: Mic, label: "Intégration vocale pour l'assistant IA" },
     { icon: TrendingUp, label: "Modèles prédictifs avancés avec Machine Learning" },
@@ -640,27 +814,26 @@ function Slide8() {
   ];
 
   return (
-    <SlideShell theme="dark">
-      <div className="siga-radial siga-noise absolute inset-0" />
-      <div className="siga-grid-bg absolute inset-0 opacity-10" />
-      <SlideNumber n={8} total={TOTAL} dark />
+    <SlideShell>
+      <div className="siga-grid-bg absolute inset-0 opacity-25" />
+      <SlideNumber n={7} total={TOTAL} />
 
       <div className="relative flex h-full flex-col px-16 py-14">
         <motion.div variants={rise} className="flex-1 flex flex-col justify-center">
-          <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-white/40 mb-4">Conclusion</div>
-          <h2 className="text-[34px] font-bold leading-[1.15] tracking-[-0.03em] text-white max-w-3xl">
+          <div className="text-[14px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "var(--siga-dark)", opacity: 0.4 }}>Conclusion</div>
+          <h2 className="text-[36px] font-black leading-[1.15] tracking-[-0.03em] max-w-3xl" style={{ color: "var(--siga-dark)" }}>
             SIGA répond à un besoin structurel des PME algériennes : une solution SaaS RH complète, conforme à la réglementation, enrichie par l'IA.
           </h2>
 
           <div className="mt-10">
-            <div className="text-[12px] font-bold uppercase tracking-[0.18em] text-white/40 mb-5">Perspectives</div>
+            <div className="text-[13px] font-black uppercase tracking-[0.18em] mb-5" style={{ color: "var(--siga-dark)", opacity: 0.4 }}>Perspectives</div>
             <div className="relative grid grid-cols-3 gap-6">
               <motion.div
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1.2, delay: 0.4 }}
                 className="absolute left-[10%] right-[10%] top-[28px] h-[2px] origin-left"
-                style={{ background: "linear-gradient(90deg, var(--siga-mid), var(--siga-light) 50%, transparent)" }}
+                style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-mid), transparent)" }}
               />
               {perspectives.map((p, i) => (
                 <motion.div
@@ -672,11 +845,11 @@ function Slide8() {
                 >
                   <div
                     className="grid h-14 w-14 place-items-center rounded-2xl text-white"
-                    style={{ background: "rgba(107,163,214,0.2)", boxShadow: "0 0 0 4px var(--siga-dark)" }}
+                    style={{ background: "var(--siga-dark)", boxShadow: "0 0 0 4px var(--siga-cream)" }}
                   >
                     <p.icon size={22} />
                   </div>
-                  <div className="mt-4 text-[14px] font-bold text-white/80 leading-snug max-w-[200px]">{p.label}</div>
+                  <div className="mt-4 text-[14px] font-bold leading-snug max-w-[200px]" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>{p.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -686,15 +859,22 @@ function Slide8() {
         <motion.div
           variants={rise}
           className="border-t pt-6 flex flex-col items-center text-center"
-          style={{ borderColor: "rgba(107,163,214,0.15)" }}
+          style={{ borderColor: "rgba(30,58,95,0.1)" }}
         >
-          <div className="siga-gradient-text text-[42px] font-bold tracking-[-0.03em]">
+          <div 
+            className="text-[42px] font-black tracking-[-0.03em]"
+            style={{
+              background: "linear-gradient(135deg, var(--siga-dark) 0%, var(--siga-mid) 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
             Merci pour votre attention
           </div>
-          <div className="mt-2 text-[15px] font-medium text-white/50">
+          <div className="mt-2 text-[15px] font-medium" style={{ color: "var(--siga-dark)", opacity: 0.5 }}>
             HAMMACHE Amira &amp; HADJI Melissa — Encadrant : M. ACHROUFENE Achour
           </div>
-          {/* Place aux questions pill removed per request */}
         </motion.div>
       </div>
     </SlideShell>
@@ -712,5 +892,4 @@ export const slides: { component: ComponentType; theme?: "light" | "dark" }[] = 
   { component: Slide5 },
   { component: Slide6 },
   { component: Slide7 },
-  { component: Slide8, theme: "dark" },
 ];
