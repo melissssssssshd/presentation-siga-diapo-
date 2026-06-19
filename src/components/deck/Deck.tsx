@@ -67,21 +67,49 @@ export function Deck() {
   const Current = slides[index].component;
   const theme = slides[index].theme ?? "light";
 
+  const slideVariants = {
+    enter: (dir: number) => ({
+      opacity: 0,
+      x: dir * 60,
+      scale: 0.97,
+      filter: "blur(6px)",
+    }),
+    center: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      filter: "blur(0px)",
+    },
+    exit: (dir: number) => ({
+      opacity: 0,
+      x: dir * -60,
+      scale: 0.97,
+      filter: "blur(6px)",
+    }),
+  };
+
   return (
     <div
       className="siga-deck fixed inset-0 overflow-hidden"
       style={{
-        background: theme === "dark" ? "var(--siga-dark)" : "var(--siga-cream)",
+        background:
+          theme === "dark"
+            ? "var(--siga-dark)"
+            : "linear-gradient(145deg, #ffffff 0%, #f0f6fd 40%, #e8f2fb 100%)",
       }}
     >
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={index}
           custom={direction}
-          initial={{ opacity: 0, x: direction * 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction * -40 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            duration: 0.55,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           className="absolute inset-0"
         >
           <Current />
@@ -92,10 +120,12 @@ export function Deck() {
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-50 h-[3px] bg-black/5">
         <motion.div
           className="h-full"
-          style={{ background: "var(--siga-light)" }}
+          style={{
+            background: "linear-gradient(90deg, var(--siga-mid), var(--siga-light))",
+          }}
           initial={false}
           animate={{ width: `${((index + 1) / slides.length) * 100}%` }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         />
       </div>
 

@@ -4,6 +4,7 @@ import {
   Users, Cloud, Bot, Shield, Check,
   Sparkles, Smartphone, TrendingUp, Mic,
   Zap, Target, FileText, PlayCircle,
+  LanguagesIcon,
 } from "lucide-react";
 import { SlideShell, Eyebrow, Logo, rise } from "./primitives";
 import type { ComponentType } from "react";
@@ -280,8 +281,10 @@ let _slide3GoBack: (() => boolean) | null = null;
 export function getSlide3Advance() { return _slide3Advance; }
 export function getSlide3GoBack() { return _slide3GoBack; }
 
+
 const CONTEXT_INTRO =
   "Les PME algériennes se multiplient, sans que les outils RH suivent le rythme";
+
 
 const LACUNES = [
   "Gestion Manuelle",
@@ -445,26 +448,55 @@ function Slide3() {
                 </div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                  initial={{ opacity: 0, y: 28, scale: 0.95, filter: "blur(8px)" }}
                   animate={{
                     opacity: showSynthese ? 1 : 0,
-                    y: showSynthese ? 0 : 20,
-                    scale: showSynthese ? 1 : 0.98,
+                    y: showSynthese ? 0 : 28,
+                    scale: showSynthese ? 1 : 0.95,
+                    filter: showSynthese ? "blur(0px)" : "blur(8px)",
                   }}
-                  transition={{ duration: 0.5, ease: morphEase }}
-                  className="rounded-[20px] px-8 py-5 text-center"
+                  transition={{ duration: 0.65, ease: morphEase }}
+                  className="relative overflow-hidden rounded-[24px] px-10 py-6 text-center"
                   style={{
-                    background: "var(--siga-dark)",
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(232,242,251,0.9) 100%)",
+                    border: "1px solid rgba(107,163,214,0.35)",
+                    boxShadow:
+                      "0 4px 24px -6px rgba(30,58,95,0.12), 0 1px 0 0 rgba(255,255,255,0.8) inset",
+                    backdropFilter: "blur(12px)",
                     pointerEvents: showSynthese ? "auto" : "none",
                   }}
                 >
+                  {/* Glow orb top-right */}
                   <div
-                    className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em]"
-                    style={{ color: "rgba(255,255,255,0.5)" }}
-                  >
-                    Synthèse finale
+                    className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-30"
+                    style={{
+                      background:
+                        "radial-gradient(circle, rgba(107,163,214,0.4), transparent 70%)",
+                    }}
+                  />
+                  {/* Label */}
+                  <div className="relative mb-3 flex items-center justify-center gap-2">
+                    <div
+                      className="h-px flex-1 rounded-full"
+                      style={{ background: "rgba(30,58,95,0.15)" }}
+                    />
+                    <span
+                      className="text-[10px] font-black uppercase tracking-[0.28em]"
+                      style={{ color: "var(--siga-mid)" }}
+                    >
+                      Synthèse finale
+                    </span>
+                    <div
+                      className="h-px flex-1 rounded-full"
+                      style={{ background: "rgba(30,58,95,0.15)" }}
+                    />
                   </div>
-                  <p className="text-[17px] font-bold leading-snug text-white">
+                  {/* Message */}
+                  <p
+                    className="relative text-[18px] font-bold leading-snug tracking-[-0.01em]"
+                    style={{ color: "var(--siga-dark)" }}
+                  >
                     {SYNTHESE}
                   </p>
                 </motion.div>
@@ -640,7 +672,7 @@ function Slide5() {
                 className="flex flex-col items-center text-center"
               >
                 <div
-                  className="grid h-[64px] w-[64px] place-items-center rounded-2xl text-[15px] font-bold text-white transition-colors duration-300"
+                  className="grid h-[74px] w-[74px] place-items-center rounded-2xl text-[17px] font-bold text-white transition-colors duration-300"
                   style={{ 
                     background: i <= step ? "var(--siga-dark)" : "var(--siga-light)", 
                     boxShadow: "0 0 0 5px var(--siga-cream)" 
@@ -648,10 +680,10 @@ function Slide5() {
                 >
                   {s.n}
                 </div>
-                <div className="mt-4 text-[13px] font-bold transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
+                <div className="mt-4 text-[15px] font-bold transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
                   {s.t} ({s.d})
                 </div>
-                <div className="mt-1 text-[12px] font-medium transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
+                <div className="mt-1.5 text-[13.5px] font-medium transition-opacity duration-300" style={{ color: "var(--siga-mid)", opacity: i <= step ? 0.85 : 0.4 }}>
                   {s.sub}
                 </div>
               </motion.div>
@@ -708,7 +740,7 @@ function Slide6() {
 function Slide7() {
   const perspectives = [
     { icon: Mic, label: "Intégration vocale pour l'assistant IA" },
-    { icon: TrendingUp, label: "Modèles prédictifs avancés avec Machine Learning" },
+    { icon: LanguagesIcon, label: "Support multilingue" },
     { icon: Smartphone, label: "Application mobile native iOS/Android" },
   ];
 
@@ -719,9 +751,12 @@ function Slide7() {
 
       <div className="relative flex h-full flex-col px-16 py-14">
         <motion.div variants={rise} className="flex-1 flex flex-col justify-center">
-          <div className="text-[14px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "var(--siga-dark)", opacity: 0.4 }}>Conclusion</div>
-          <h2 className="text-[36px] font-black leading-[1.15] tracking-[-0.03em] max-w-3xl" style={{ color: "var(--siga-dark)" }}>
-            SIGA répond à un besoin structurel des PME algériennes : une solution SaaS RH complète, conforme à la réglementation, enrichie par l'IA.
+          <h2
+  className="max-w-[1200px] text-[60px] font-black leading-[0.92] tracking-[-0.06em] mb-6"
+  style={{ color: "var(--siga-dark)" }}
+>Conclusion</h2>
+          <h2 className="text-[22px] font-black leading-[1.15] tracking-[-0.03em] max-w-2xl" style={{ color: "var(--siga-dark)" }}>
+            SIGA répond à un besoin structurel des PME algériennes : une solution SaaS RH complète, conforme à la réglementation, enrichie par l’IA.
           </h2>
 
           <div className="mt-10">
