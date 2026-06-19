@@ -1,9 +1,9 @@
-import { motion, AnimatePresence, useAnimation, type Variants } from "framer-motion";
-import { useState, useCallback } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useState } from "react";
 import {
-  Users, Cloud, Bot, Shield, Check, X,
+  Users, Cloud, Bot, Shield, Check,
   Sparkles, Smartphone, TrendingUp, Mic,
-  ChevronRight, Zap, Target, FileText, PlayCircle,
+  Zap, Target, FileText, PlayCircle,
 } from "lucide-react";
 import { SlideShell, Eyebrow, Logo, rise } from "./primitives";
 import type { ComponentType } from "react";
@@ -280,109 +280,51 @@ let _slide3GoBack: (() => boolean) | null = null;
 export function getSlide3Advance() { return _slide3Advance; }
 export function getSlide3GoBack() { return _slide3GoBack; }
 
-const contextSteps = [
-  {
-    emoji: "📊",
-    label: "Excel & papier",
-    desc: "Suivi manuel, erreurs fréquentes, zéro traçabilité",
-    arrow: true,
-    highlight: false,
-  },
-  {
-    emoji: "💰",
-    label: "ERP coûteux",
-    desc: "SAP, Oracle — inadaptés, hors budget PME algériennes",
-    arrow: true,
-    highlight: false,
-  },
-  {
-    emoji: "✦",
-    label: "SIGA",
-    desc: "Solution locale, accessible, conforme et intelligente",
-    arrow: false,
-    highlight: true,
-  },
+const CONTEXT_INTRO =
+  "Tissu de PME algérien dense et en croissance constante, mais sans solution RH adaptée";
+
+const LACUNES = [
+  "Gestion Manuelle",
+  "Solutions Fragmentées",
+  "Conformité Réglementaire",
+  "Manque d'Automatisation",
 ];
 
-const problems = [
-  { t: "Gestion Manuelle", d: "Saisie manuelle des bulletins de paie, suivi des absences sur Excel, calcul des cotisations sociales sujet aux erreurs." },
-  { t: "Solutions Fragmentées", d: "Absence de solutions intégrées adaptées au contexte algérien. Les ERP (SAP, Oracle) sont trop coûteux pour les PME." },
-  { t: "Conformité Réglementaire", d: "Difficultés à assurer la conformité avec les évolutions fréquentes du cadre légal (CNAS, impôts, déclarations sociales)." },
-  { t: "Manque d'Automatisation", d: "Les solutions existantes n'exploitent pas les technologies intelligentes." },
-];
+const SYNTHESE =
+  "Aucune solution ne réunit conformité locale + automatisation + UX moderne";
+
+/* step 0 = contexte · 1 = problématique · 2–5 = lacunes · 6 = synthèse */
+const SLIDE3_MAX_STEP = 6;
 
 function Slide3() {
-  const [tab, setTab] = useState<"context" | "problems">("context");
-  const [dir, setDir] = useState<1 | -1>(1); // 1 = forward (→), -1 = backward (←)
-  const [probStep, setProbStep] = useState(0);
+  const [step, setStep] = useState(0);
 
-  // ── Animation controllers ──────────────────────────────────
-  const panelCtrl = useAnimation(); // the content flip
-
-  // Sequence: content page-turns with slow crossfade
-  const switchTab = useCallback(async (next: "context" | "problems", direction: 1 | -1) => {
-    setDir(direction);
-
-    // 1. Content softly folds away — slower, deeper rotation + fade + blur
-    await panelCtrl.start({
-      rotateY: direction * 22,
-      x: direction * -40,
-      opacity: 0,
-      scale: 0.96,
-      filter: "blur(4px)",
-      transition: { duration: 0.55, ease: [0.4, 0, 0.6, 1] },
-    });
-
-    // 2. Small breathing pause
-    await new Promise(r => setTimeout(r, 100));
-
-    // 3. Swap content (invisible)
-    setTab(next);
-
-    // 4. Position new content on the opposite side
-    panelCtrl.set({
-      rotateY: direction * -22,
-      x: direction * 40,
-      opacity: 0,
-      scale: 0.96,
-      filter: "blur(4px)",
-    });
-
-    // 5. New content gracefully unfolds in
-    panelCtrl.start({
-      rotateY: 0,
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      filter: "blur(0px)",
-      transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-    });
-  }, [panelCtrl]);
-
-  // Register callbacks for Deck arrow-key navigation
   _slide3Advance = () => {
-    if (tab === "context") { 
-      setProbStep(0);
-      switchTab("problems", 1); 
-      return true; 
-    }
-    if (tab === "problems" && probStep < 6) {
-      setProbStep(p => p + 1);
+    if (step < SLIDE3_MAX_STEP) {
+      setStep(s => s + 1);
       return true;
     }
     return false;
   };
+
   _slide3GoBack = () => {
-    if (tab === "problems") { 
-      if (probStep > 0) {
-        setProbStep(p => p - 1);
-        return true;
-      }
-      switchTab("context", -1); 
-      return true; 
+    if (step > 0) {
+      setStep(s => s - 1);
+      return true;
     }
     return false;
   };
+
+  const introCompact = step >= 1;
+  const showLacunes = step >= 1;
+  const showSynthese = step >= SLIDE3_MAX_STEP;
+
+  const cardReveal: Variants = {
+    hidden: { opacity: 0, y: 24, scale: 0.96 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  };
+
+  const morphEase = [0.22, 1, 0.36, 1] as const;
 
   return (
     <SlideShell>
@@ -390,200 +332,157 @@ function Slide3() {
       <SlideNumber n={3} total={TOTAL} />
 
       <div className="relative flex h-full flex-col px-16 py-14">
-
-        {/* ── Header (fixed — doesn't transition) ─────────── */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Eyebrow>Analyse du Marché</Eyebrow>
-            <h2
-              className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
-              style={{ color: "var(--siga-dark)" }}
-            >
-              {tab === "context" ? (
-                <>Contexte<br /><span style={{ color: "var(--siga-mid)" }}>du Marché.</span></>
-              ) : (
-                <>Problé<span style={{ color: "var(--siga-mid)" }}>matique.</span></>
-              )}
-            </h2>
-          </div>
-
+        <div className="mb-6">
+          <Eyebrow>Analyse du Marché</Eyebrow>
+          <h2
+            className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
+            style={{ color: "var(--siga-dark)" }}
+          >
+            Contexte &{" "}
+            <span style={{ color: "var(--siga-mid)" }}>Problématique.</span>
+          </h2>
         </div>
 
-        {/* ── Stage : perspective container ──────────────── */}
-        <div
-          className="flex-1 relative overflow-hidden"
-          style={{ perspective: "1400px", perspectiveOrigin: "50% 50%" }}
-        >
-          {/* CONTENT PANEL — flips slowly */}
+        <div className="relative flex flex-1 flex-col overflow-hidden">
+          {/* Intro — hero centré → bandeau compact en haut */}
           <motion.div
-            animate={panelCtrl}
-            initial={{ rotateY: 0, opacity: 1 }}
-            style={{
-              transformStyle: "preserve-3d",
-              backfaceVisibility: "hidden",
-              transformOrigin: "50% 50%",
-              position: "absolute",
-              inset: 0,
-            }}
+            layout
+            className={
+              introCompact
+                ? "mx-auto w-full max-w-3xl shrink-0 px-4 pb-6 text-center"
+                : "flex flex-1 items-center justify-center px-8 text-center"
+            }
+            transition={{ layout: { duration: 0.75, ease: morphEase } }}
           >
-            {tab === "context" ? (
-              /* ── CONTEXTE content ─────────────────────── */
-              <div className="flex h-full gap-14">
-                {/* LEFT — big stat */}
-                <div className="flex w-[300px] flex-none flex-col justify-center">
-                  <div
-                    className="text-[100px] font-black leading-none tracking-[-0.05em]"
-                    style={{
-                      background: "linear-gradient(135deg, var(--siga-dark) 0%, var(--siga-mid) 100%)",
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
-                    97%
-                  </div>
-                  <div className="mt-3 text-[18px] font-bold leading-snug" style={{ color: "var(--siga-dark)" }}>
-                    des PME algériennes gèrent leur RH sans outil digital dédié.
-                  </div>
-                  <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--siga-mid)", opacity: 0.7 }}>
-                    Source : analyse de marché — mémoire SIGA 2026
-                  </div>
-                  <div className="mt-5 h-1 w-14 rounded-full" style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-light))" }} />
-                </div>
+            <motion.p
+              layout
+              className="font-bold tracking-[-0.02em]"
+              style={{ color: "var(--siga-dark)" }}
+              animate={{
+                fontSize: introCompact ? 17 : 30,
+                lineHeight: introCompact ? 1.45 : 1.35,
+                opacity: introCompact ? 0.7 : 1,
+              }}
+              transition={{ duration: 0.75, ease: morphEase }}
+            >
+              {CONTEXT_INTRO}
+            </motion.p>
 
-                {/* RIGHT — text + frise */}
-                <div className="flex flex-1 flex-col justify-between">
-                  <p className="max-w-2xl text-[17px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>
-                    La digitalisation RH progresse en Algérie, mais les PME restent largement sur Excel et papier.
-                    Les ERP existants (SAP, Oracle) sont trop coûteux et peu adaptés au contexte local.
-                    Il existe un besoin réel de solutions RH accessibles, modernes et conformes à la réglementation algérienne.
-                  </p>
+            <motion.div
+              className="mx-auto rounded-full"
+              style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-light))" }}
+              animate={{
+                marginTop: introCompact ? 14 : 32,
+                height: introCompact ? 2 : 4,
+                width: introCompact ? 48 : 64,
+                opacity: introCompact ? 0.5 : 1,
+              }}
+              transition={{ duration: 0.75, ease: morphEase }}
+            />
+          </motion.div>
 
-                  {/* frise progression */}
-                  <div className="mb-2">
-                    <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--siga-dark)", opacity: 0.6 }}>
-                      Progression du marché
-                    </div>
-                    <div className="flex items-center">
-                      {contextSteps.map((s, i) => (
-                        <div key={i} className="flex items-center">
-                          <div
-                            className="flex flex-col rounded-xl p-4"
-                            style={{
-                              background: s.highlight ? "var(--siga-dark)" : "white",
-                              border: s.highlight ? "none" : "1px solid rgba(30,58,95,0.1)",
-                              boxShadow: s.highlight
-                                ? "0 0 0 1px rgba(107,163,214,0.3), 0 10px 24px -8px rgba(30,58,95,0.35)"
-                                : "0 1px 4px rgba(30,58,95,0.06)",
-                              minWidth: "138px",
-                            }}
-                          >
-                            <div className="text-[13px] mb-1.5 opacity-60" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>{s.emoji}</div>
-                            <div className="text-[14px] font-bold" style={{ color: s.highlight ? "white" : "var(--siga-dark)" }}>{s.label}</div>
-                            <div className="mt-1 text-[11px] font-medium leading-snug"
-                              style={{ color: s.highlight ? "rgba(255,255,255,0.6)" : "var(--siga-dark)", opacity: s.highlight ? 1 : 0.6 }}>
-                              {s.desc}
-                            </div>
-                          </div>
-                          {s.arrow && (
-                            <div className="mx-2.5 flex items-center">
-                              <div className="h-0.5 w-6 rounded-full" style={{ background: "var(--siga-light)" }} />
-                              <ChevronRight size={13} style={{ color: "var(--siga-light)", marginLeft: "-3px" }} />
-                            </div>
-                          )}
+          {/* Pont visuel contexte → lacunes */}
+          <AnimatePresence>
+            {step === 1 && (
+              <motion.div
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                exit={{ opacity: 0, scaleY: 0 }}
+                transition={{ duration: 0.45, ease: morphEase }}
+                className="mx-auto mb-4 h-px w-24 origin-top"
+                style={{ background: "rgba(30,58,95,0.12)" }}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Lacunes */}
+          <AnimatePresence>
+            {showLacunes && (
+              <motion.div
+                initial={{ opacity: 0, y: 36 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 24 }}
+                transition={{ duration: 0.7, ease: morphEase, delay: introCompact ? 0.08 : 0 }}
+                className="flex flex-1 flex-col justify-center gap-8"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  {LACUNES.map((label, i) => {
+                    const visible = step >= i + 2;
+                    const isLatest = step === i + 2;
+                    return (
+                      <motion.div
+                        key={label}
+                        initial="hidden"
+                        animate={visible ? "show" : "hidden"}
+                        variants={cardReveal}
+                        className="flex items-center gap-5 rounded-[22px] border bg-white px-7 py-5 transition-shadow duration-300"
+                        style={{
+                          borderColor: isLatest ? "var(--siga-mid)" : "rgba(30,58,95,0.08)",
+                          borderWidth: isLatest ? "2px" : "1px",
+                          boxShadow: isLatest
+                            ? "0 12px 32px -12px rgba(30,58,95,0.2)"
+                            : "0 2px 8px rgba(30,58,95,0.05)",
+                        }}
+                      >
+                        <div
+                          className="grid h-10 w-10 flex-none place-items-center rounded-xl text-[13px] font-black"
+                          style={{
+                            background: isLatest ? "var(--siga-dark)" : "var(--siga-bg)",
+                            color: isLatest ? "white" : "var(--siga-mid)",
+                          }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* ── PROBLÉMATIQUE content ────────────────── */
-              <div className="relative flex h-full gap-12">
-                {/* LEFT SIDE */}
-                <div className="flex w-[340px] flex-none flex-col py-2">
-                  <div>
-                    <p className="text-[17px] font-medium leading-relaxed" style={{ color: "var(--siga-dark)", opacity: 0.85 }}>
-                      Les entreprises algériennes, particulièrement les PME, font face à des lacunes critiques :
-                    </p>
-                  </div>
+                        <div
+                          className="text-[19px] font-bold tracking-tight"
+                          style={{ color: "var(--siga-dark)" }}
+                        >
+                          {label}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
 
-                {/* CENTERED IMPACT CARD */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  animate={{ 
-                    opacity: probStep === 6 ? 1 : 0, 
-                    y: probStep === 6 ? 0 : 30,
-                    scale: probStep === 6 ? 1 : 0.95,
-                    pointerEvents: probStep === 6 ? "auto" : "none"
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                  animate={{
+                    opacity: showSynthese ? 1 : 0,
+                    y: showSynthese ? 0 : 20,
+                    scale: showSynthese ? 1 : 0.98,
                   }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[24px] p-8 shadow-2xl" 
-                  style={{ 
-                    background: "white", 
-                    border: "2px solid rgba(107,163,214,0.15)",
-                    boxShadow: "0 20px 40px -15px rgba(30,58,95,0.2)",
-                    width: "480px" 
+                  transition={{ duration: 0.5, ease: morphEase }}
+                  className="rounded-[20px] px-8 py-5 text-center"
+                  style={{
+                    background: "var(--siga-dark)",
+                    pointerEvents: showSynthese ? "auto" : "none",
                   }}
                 >
-                  <div className="mb-6 text-center text-[12px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--siga-mid)" }}>
-                    Impact sur les PME
-                  </div>
-                  <div className="space-y-4">
-                    {[
-                      { l: "Perte de productivité", v: "Élevée" },
-                      { l: "Risque d'erreurs", v: "Élevé" },
-                      { l: "Visibilité décisionnelle", v: "Faible" }
-                    ].map(item => (
-                      <div key={item.l} className="flex justify-between items-center text-[15px] border-b pb-4 last:border-0 last:pb-0" style={{ borderColor: "rgba(30,58,95,0.06)" }}>
-                        <span className="font-semibold" style={{ color: "var(--siga-dark)", opacity: 0.8 }}>{item.l}</span>
-                        <span className="font-black" style={{ color: "var(--siga-dark)" }}>{item.v}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* RIGHT SIDE (CARDS) */}
-                <div className="flex flex-1 flex-col justify-center space-y-3.5">
-                  {problems.map((b, i) => (
-                    <motion.div
-                      key={b.t}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ 
-                        opacity: probStep > i && probStep < 6 ? 1 : 0, 
-                        x: probStep === 6 ? -20 : (probStep > i ? 0 : 20) 
-                      }}
-                      transition={{ duration: 0.4 }}
-                      className="flex items-center gap-5 rounded-[20px] bg-white px-7 py-4 shadow-sm"
-                      style={{ border: "1px solid rgba(30,58,95,0.06)" }}
-                    >
-                      <div className="flex-none rounded-full p-1.5" style={{ background: "var(--siga-bg)", color: "var(--siga-mid)" }}>
-                        <X size={18} strokeWidth={3} />
-                      </div>
-                      <div className="text-[18px] font-bold tracking-tight" style={{ color: "var(--siga-dark)" }}>
-                        {b.t}
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ 
-                      opacity: probStep >= 5 && probStep < 6 ? 1 : 0, 
-                      y: probStep === 6 ? -20 : (probStep >= 5 ? 0 : 20) 
-                    }}
-                    transition={{ duration: 0.5 }}
-                    className="mt-3 rounded-[16px] p-4 text-center text-[14px] font-bold text-white shadow-lg"
-                    style={{ background: "var(--siga-dark)" }}
+                  <div
+                    className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em]"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
                   >
-                    Constat : Aucune solution ne réunit conformité locale + automatisation + UX moderne
-                  </motion.div>
-                </div>
-              </div>
+                    Synthèse finale
+                  </div>
+                  <p className="text-[17px] font-bold leading-snug text-white">
+                    {SYNTHESE}
+                  </p>
+                </motion.div>
+              </motion.div>
             )}
-          </motion.div>
+          </AnimatePresence>
         </div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.45 }}
+          className="mt-4 text-center text-[11px] font-medium"
+          style={{ color: "var(--siga-mid)" }}
+        >
+          {step < SLIDE3_MAX_STEP
+            ? "Flèche → pour continuer"
+            : "Flèche → pour la slide suivante"}
+        </motion.p>
       </div>
     </SlideShell>
   );
