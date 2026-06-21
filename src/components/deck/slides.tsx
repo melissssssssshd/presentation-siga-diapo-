@@ -138,7 +138,7 @@ const SOMMAIRE_SECTIONS = [
     n: "03",
     icon: PlayCircle,
     t: "Présentation Vidéo",
-    d: "Démonstration complète de la plateforme SIGA (6 minutes)",
+    d: "Démonstration complète de la plateforme SIGA",
   },
   {
     n: "04",
