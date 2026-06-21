@@ -1,11 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize, Minimize } from "lucide-react";
 import { slides, getSlide2Advance, getSlide2GoBack, getSlide3Advance, getSlide3GoBack } from "./slides";
 
 export function Deck() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   const go = useCallback(
     (delta: number) => {
@@ -143,6 +162,14 @@ export function Deck() {
           className="grid h-8 w-8 place-items-center rounded-full text-[color:var(--siga-dark)] transition hover:bg-[color:var(--siga-bg)] disabled:opacity-30"
         >
           <ChevronRight size={16} />
+        </button>
+        <div className="mx-1 h-4 w-px bg-black/10" />
+        <button
+          onClick={toggleFullscreen}
+          aria-label="Toggle fullscreen"
+          className="grid h-8 w-8 place-items-center rounded-full text-[color:var(--siga-dark)] transition hover:bg-[color:var(--siga-bg)]"
+        >
+          {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
         </button>
       </div>
     </div>
