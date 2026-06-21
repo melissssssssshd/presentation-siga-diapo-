@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Users, Cloud, Bot, Shield, Check,
   Sparkles, Smartphone, TrendingUp, Mic,
-  Zap, Target, FileText, PlayCircle,
+  Zap, Target, PlayCircle,
   LanguagesIcon,
 } from "lucide-react";
 import { SlideShell, Eyebrow, Logo, rise } from "./primitives";
@@ -22,7 +22,7 @@ function SlideNumber({ n, total, dark = false }: { n: number; total: number; dar
   );
 }
 
-const TOTAL = 7;
+const TOTAL = 6;
 
 /* ══════════════════════════════════════════════════════════════
    SLIDE 1 — PAGE DE TITRE
@@ -39,12 +39,16 @@ function Slide1() {
         </motion.div>
 
         <div className="flex flex-1 flex-col items-center justify-center px-12 text-center">
+          <motion.div variants={rise} className="mb-6">
+            <img src="/mon-nouveau-logo.png" alt="Logo de l'entreprise/université" className="h-24 object-contain mx-auto" />
+          </motion.div>
+          
           <motion.div variants={rise}>
             <span
               className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-1.5 text-[13px] font-bold uppercase tracking-[0.18em]"
               style={{ borderColor: "rgba(30,58,95,0.1)", color: "var(--siga-dark)" }}
             >
-              <Sparkles size={13} /> Mémoire de Fin d'Études — 2025/2026
+              Mémoire de Fin d'Études — 2025/2026
             </span>
           </motion.div>
 
@@ -87,13 +91,19 @@ function Slide1() {
             style={{ borderColor: "rgba(30,58,95,0.1)" }}
           >
             {[
-              { k: "Réalisé par", v: "HAMMACHE Amira", v2: "HADJI Melissaaaaa" },
-              { k: "Encadrant", v: "M. ACHROUFENE Achour", v2: "Soutenance de Master" },
+              { k: "Réalisé par", names: ["HAMMACHE Amira", "HADJI Melissa"], subtitle: "" },
+              { k: "Encadrant", names: ["M. ACHROUFENE Achour"], subtitle: "Soutenance de Master" },
             ].map((item) => (
               <div key={item.k} className="border-r px-10 py-5 text-left last:border-0" style={{ borderColor: "rgba(30,58,95,0.05)" }}>
-                <div className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--siga-dark)", opacity: 0.6 }}>{item.k}</div>
-                <div className="mt-2 text-[16px] font-bold" style={{ color: "var(--siga-dark)" }}>{item.v}</div>
-                <div className="text-[14px] font-medium" style={{ color: "var(--siga-dark)", opacity: 0.7 }}>{item.v2}</div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "black" }}>{item.k}</div>
+                <div className="mt-2">
+                  {item.names.map((name, idx) => (
+                    <div key={idx} className="text-[16px] font-bold" style={{ color: "var(--siga-dark)" }}>{name}</div>
+                  ))}
+                </div>
+                {item.subtitle && (
+                  <div className="text-[14px] font-normal" style={{ color: "var(--siga-dark)" }}>{item.subtitle}</div>
+                )}
               </div>
             ))}
           </motion.div>
@@ -126,18 +136,12 @@ const SOMMAIRE_SECTIONS = [
   },
   {
     n: "03",
-    icon: FileText,
-    t: "Méthodologie",
-    d: "Approche Scrum agile en 6 sprints — stack technique moderne",
-  },
-  {
-    n: "04",
     icon: PlayCircle,
     t: "Présentation Vidéo",
     d: "Démonstration complète de la plateforme SIGA (6 minutes)",
   },
   {
-    n: "05",
+    n: "04",
     icon: Check,
     t: "Conclusion",
     d: "Bilan, perspectives et ouverture vers les questions",
@@ -593,116 +597,13 @@ function Slide4() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 5 — APPROCHE SCRUM
+   SLIDE 5 — DÉMONSTRATION
 ══════════════════════════════════════════════════════════════ */
-let _slide5Advance: (() => boolean) | null = null;
-let _slide5GoBack: (() => boolean) | null = null;
-
-export function getSlide5Advance() { return _slide5Advance; }
-export function getSlide5GoBack() { return _slide5GoBack; }
-
 function Slide5() {
-  const sprints = [
-    { n: "S0", t: "Planification", d: "2s", sub: "Charte graphique, stack, backlog" },
-    { n: "S1", t: "Onboarding", d: "4s", sub: "Auth, abonnements" },
-    { n: "S2-3", t: "Core RH", d: "6s", sub: "Employés, congés, pointage" },
-    { n: "S4", t: "Paie", d: "5s", sub: "Moteur de calcul" },
-    { n: "S5", t: "IA & Messagerie", d: "3s", sub: "Chatbot, web sockets" },
-    { n: "S6", t: "Intelligence Métier", d: "4s", sub: "ATS, devis, prédiction" },
-  ];
-
-  const [step, setStep] = useState(0);
-
-  _slide5Advance = () => {
-    if (step < sprints.length - 1) {
-      setStep(s => s + 1);
-      return true;
-    }
-    return false;
-  };
-  _slide5GoBack = () => {
-    if (step > 0) {
-      setStep(s => s - 1);
-      return true;
-    }
-    return false;
-  };
-
-  return (
-    <SlideShell>
-      <div className="siga-grid-bg absolute inset-0 opacity-30" />
-      <SlideNumber n={5} total={TOTAL} />
-
-      <div className="relative flex h-full flex-col px-16 py-14">
-        <Eyebrow>Méthodologie Agile</Eyebrow>
-
-        <div>
-          <motion.h2
-            variants={rise}
-            className="mt-4 text-[44px] font-black leading-[1.05] tracking-[-0.04em]"
-            style={{ color: "var(--siga-dark)" }}
-          >
-            Approche Scrum
-            <br />
-            <span style={{ color: "var(--siga-mid)" }}>en 6 sprints.</span>
-          </motion.h2>
-        </div>
-
-        {/* sprint timeline */}
-        <div className="relative mt-16 flex-1">
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-            className="absolute left-0 right-0 top-[56px] h-[3px] origin-left rounded-full"
-            style={{ background: "linear-gradient(90deg, var(--siga-dark), var(--siga-mid), var(--siga-light))" }}
-          />
-
-          <div className="relative grid grid-cols-6 gap-2">
-            {sprints.map((s, i) => (
-              <motion.div
-                key={s.n}
-                initial={false}
-                animate={{ 
-                  opacity: i <= step ? 1 : 0, 
-                  y: i <= step ? 0 : 20,
-                  scale: i === step ? 1.05 : (i < step ? 1 : 0.95)
-                }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="flex flex-col items-center text-center"
-              >
-                <div
-                  className="grid h-[74px] w-[74px] place-items-center rounded-2xl text-[17px] font-bold text-white transition-colors duration-300"
-                  style={{ 
-                    background: i <= step ? "var(--siga-dark)" : "var(--siga-light)", 
-                    boxShadow: "0 0 0 5px var(--siga-cream)" 
-                  }}
-                >
-                  {s.n}
-                </div>
-                <div className="mt-4 text-[15px] font-bold transition-opacity duration-300" style={{ color: "var(--siga-dark)", opacity: i <= step ? 1 : 0.4 }}>
-                  {s.t} ({s.d})
-                </div>
-                <div className="mt-1.5 text-[13.5px] font-medium transition-opacity duration-300" style={{ color: "var(--siga-mid)", opacity: i <= step ? 0.85 : 0.4 }}>
-                  {s.sub}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </SlideShell>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SLIDE 6 — DÉMONSTRATION
-══════════════════════════════════════════════════════════════ */
-function Slide6() {
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-25" />
-      <SlideNumber n={6} total={TOTAL} />
+      <SlideNumber n={5} total={TOTAL} />
 
       <div className="relative flex h-full flex-col items-center px-16 py-14">
         <Eyebrow>Démonstration</Eyebrow>
@@ -735,9 +636,9 @@ function Slide6() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SLIDE 7 — CONCLUSION + MERCI
+   SLIDE 6 — CONCLUSION + MERCI
 ══════════════════════════════════════════════════════════════ */
-function Slide7() {
+function Slide6() {
   const perspectives = [
     { icon: Mic, label: "Intégration vocale pour l'assistant IA" },
     { icon: LanguagesIcon, label: "Support multilingue" },
@@ -747,7 +648,7 @@ function Slide7() {
   return (
     <SlideShell>
       <div className="siga-grid-bg absolute inset-0 opacity-25" />
-      <SlideNumber n={7} total={TOTAL} />
+      <SlideNumber n={6} total={TOTAL} />
 
       <div className="relative flex h-full flex-col px-16 py-14">
         <motion.div variants={rise} className="flex-1 flex flex-col justify-center">
@@ -825,5 +726,4 @@ export const slides: { component: ComponentType; theme?: "light" | "dark" }[] = 
   { component: Slide4 },
   { component: Slide5 },
   { component: Slide6 },
-  { component: Slide7 },
 ];

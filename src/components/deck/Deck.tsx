@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { slides, getSlide2Advance, getSlide2GoBack, getSlide3Advance, getSlide3GoBack, getSlide5Advance, getSlide5GoBack } from "./slides";
+import { slides, getSlide2Advance, getSlide2GoBack, getSlide3Advance, getSlide3GoBack } from "./slides";
 
 export function Deck() {
   const [index, setIndex] = useState(0);
@@ -27,17 +27,6 @@ export function Deck() {
           if (consumed) return;
         } else if (delta === -1) {
           const consumed = getSlide3GoBack()?.();
-          if (consumed) return;
-        }
-      }
-
-      // Slide 5 (index 4): intercept arrow for internal sprint reveal
-      if (index === 4) {
-        if (delta === 1) {
-          const consumed = getSlide5Advance()?.();
-          if (consumed) return;
-        } else if (delta === -1) {
-          const consumed = getSlide5GoBack()?.();
           if (consumed) return;
         }
       }
