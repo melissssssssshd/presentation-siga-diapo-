@@ -626,7 +626,7 @@ function Slide5() {
               </div>
             </div>
             <motion.p variants={rise} className="mt-5 text-[18px] font-bold" style={{ color: "var(--siga-dark)" }}>
-              Lancer la vidéo (6 minutes)
+              Lancer la vidéo 
             </motion.p>
           </motion.div>
         </div>
